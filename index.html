@@ -1,0 +1,524 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Delta Trades | Institutional Trader Utility Suite</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        deltaBg: '#05070B',
+                        deltaCard: '#0E131F',
+                        deltaBorder: '#1E2638',
+                        deltaGreen: '#00F076',
+                        deltaBlue: '#00A3FF',
+                        deltaPurple: '#A855F7',
+                        deltaRed: '#FF3B5C',
+                        deltaYellow: '#FFB800'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #05070B;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .glass-panel {
+            background: linear-gradient(180deg, rgba(14, 19, 31, 0.9) 0%, rgba(9, 12, 20, 0.95) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(30, 38, 56, 0.8);
+        }
+        .glow-green {
+            box-shadow: 0 0 20px rgba(0, 240, 118, 0.15);
+        }
+        .glow-blue {
+            box-shadow: 0 0 20px rgba(0, 163, 255, 0.15);
+        }
+    </style>
+</head>
+<body class="text-gray-100 min-h-screen flex flex-col justify-between pb-20 md:pb-6 selection:bg-deltaGreen selection:text-black">
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-deltaBorder px-4 py-3">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-deltaGreen via-deltaBlue to-deltaPurple flex items-center justify-center font-black text-black text-xl shadow-lg shadow-deltaGreen/20">
+                    Δ
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-extrabold tracking-tight text-lg text-white">DELTA <span class="text-deltaGreen">TRADES</span></span>
+                        <span class="text-[10px] font-mono font-bold bg-deltaGreen/10 text-deltaGreen border border-deltaGreen/30 px-2 py-0.5 rounded-full uppercase tracking-widest">INSTITUTIONAL</span>
+                    </div>
+                    <p class="text-[10px] text-gray-400 hidden sm:block">Advanced Risk Engine & Market Calculator Suite</p>
+                </div>
+            </div>
+
+            <!-- Desktop Navigation Tabs -->
+            <nav class="hidden md:flex items-center gap-1 bg-deltaBg/80 p-1.5 rounded-xl border border-deltaBorder">
+                <button onclick="switchTab('position')" id="dtab-position" class="tab-btn-desktop px-4 py-2 rounded-lg text-xs font-semibold transition-all bg-deltaGreen text-black shadow-md">Position Risk</button>
+                <button onclick="switchTab('leverage')" id="dtab-leverage" class="tab-btn-desktop px-4 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition-all">Leverage & Margin</button>
+                <button onclick="switchTab('rr')" id="dtab-rr" class="tab-btn-desktop px-4 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition-all">R:R Engine</button>
+                <button onclick="switchTab('compound')" id="dtab-compound" class="tab-btn-desktop px-4 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition-all">Compound Growth</button>
+                <button onclick="switchTab('journal')" id="dtab-journal" class="tab-btn-desktop px-4 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition-all">Quick Scratchpad</button>
+            </nav>
+
+            <!-- Institutional Badge / Status Indicator -->
+            <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1.5 text-xs font-mono bg-deltaBorder/50 text-deltaGreen px-3 py-2 rounded-xl border border-deltaGreen/20">
+                    <span class="w-2 h-2 rounded-full bg-deltaGreen animate-ping"></span>
+                    <span>SYSTEM ONLINE</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="max-w-7xl mx-auto px-4 py-6 w-full flex-grow">
+
+        <!-- TAB 1: POSITION SIZE CALCULATOR -->
+        <section id="position" class="calc-section grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Left Form Panel -->
+            <div class="lg:col-span-7 glass-panel p-6 rounded-3xl border border-deltaBorder glow-green">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-xl font-black text-white flex items-center gap-2">
+                            Position Size & Risk Manager
+                        </h2>
+                        <p class="text-xs text-gray-400 mt-0.5">Calculate precise lot sizes and absolute dollar risk per trade.</p>
+                    </div>
+                    <span class="w-3 h-3 rounded-full bg-deltaGreen animate-pulse"></span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1.5">Account Portfolio ($)</label>
+                        <input type="number" id="ps-balance" value="5000" oninput="calculatePosition()" class="w-full bg-deltaBg border border-deltaBorder rounded-xl p-3.5 text-white font-mono text-sm focus:border-deltaGreen focus:ring-1 focus:ring-deltaGreen outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1.5">Max Risk Target (%)</label>
+                        <input type="number" id="ps-risk" value="1" step="0.25" oninput="calculatePosition()" class="w-full bg-deltaBg border border-deltaBorder rounded-xl p-3.5 text-white font-mono text-sm focus:border-deltaGreen focus:ring-1 focus:ring-deltaGreen outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1.5">Entry Execution Price ($)</label>
+                        <input type="number" id="ps-entry" value="150" oninput="calculatePosition()" class="w-full bg-deltaBg border border-deltaBorder rounded-xl p-3.5 text-white font-mono text-sm focus:border-deltaGreen focus:ring-1 focus:ring-deltaGreen outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1.5">Stop Loss Level ($)</label>
+                        <input type="number" id="ps-stop" value="142" oninput="calculatePosition()" class="w-full bg-deltaBg border border-deltaBorder rounded-xl p-3.5 text-white font-mono text-sm focus:border-deltaGreen focus:ring-1 focus:ring-deltaGreen outline-none transition">
+                    </div>
+                </div>
+
+                <!-- Range Slider for Quick Risk Adjustment -->
+                <div class="mt-6 p-4 rounded-2xl bg-deltaBg/60 border border-deltaBorder">
+                    <div class="flex justify-between text-xs font-medium text-gray-400 mb-2">
+                        <span>Quick Risk Selector</span>
+                        <span id="slider-risk-val" class="text-deltaGreen font-bold font-mono">1.0%</span>
+                    </div>
+                    <input type="range" id="ps-risk-slider" min="0.25" max="5" step="0.25" value="1" oninput="syncRiskSlider(this.value)" class="w-full accent-deltaGreen cursor-pointer">
+                </div>
+            </div>
+
+            <!-- Right Results Analytics Panel -->
+            <div class="lg:col-span-5 flex flex-col justify-between glass-panel p-6 rounded-3xl border border-deltaBorder">
+                <div>
+                    <span class="text-[11px] font-mono font-bold text-deltaGreen tracking-widest uppercase bg-deltaGreen/10 border border-deltaGreen/20 px-2.5 py-1 rounded-md">Live Output Metrics</span>
+                    
+                    <div class="mt-6 space-y-5">
+                        <div class="p-4 rounded-2xl bg-deltaBg/80 border border-deltaBorder">
+                            <p class="text-xs text-gray-400 font-medium">Max Dollar Loss Exposure</p>
+                            <p id="out-ps-risk-usd" class="text-3xl font-black font-mono text-deltaRed mt-1">$50.00</p>
+                        </div>
+                        
+                        <div class="p-4 rounded-2xl bg-deltaBg/80 border border-deltaBorder">
+                            <p class="text-xs text-gray-400 font-medium">Recommended Position Size</p>
+                            <p id="out-ps-units" class="text-3xl font-black font-mono text-deltaGreen mt-1">6.25 Units</p>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-deltaBg/80 border border-deltaBorder">
+                            <p class="text-xs text-gray-400 font-medium">Total Notional Position Value</p>
+                            <p id="out-ps-total" class="text-2xl font-bold font-mono text-white mt-1">$937.50</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-deltaBorder/60 flex items-center justify-between text-xs text-gray-400">
+                    <span>Account Portfolio Usage:</span>
+                    <span id="out-ps-usage" class="font-mono font-bold text-deltaBlue">18.75%</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: LEVERAGE & LIQUIDATION -->
+        <section id="leverage" class="calc-section grid grid-cols-1 lg:grid-cols-12 gap-6 hidden">
+            <div class="lg:col-span-7 glass-panel p-6 rounded-3xl border border-deltaBorder glow-blue">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-xl font-black text-white flex items-center gap-2">
+                            Leverage & Liquidation Matrix
+                        </h2>
+                        <p class="text-xs text-gray-400 mt-0.5">Estimate exchange margin requirements and estimated liquidation levels.</p>
+                    </div>
+                    <span class="w-3 h-3 rounded-full bg-deltaBlue animate-pulse"></span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="sm:col-span-2 flex gap-2 p-1.5 bg-deltaBg rounded-2xl border border-deltaBorder">
+                        <button onclick="setLevDirection('long')" id="btn-dir-long" class="flex-1 py-2.5 rounded-xl font-bold text-xs transition bg-deltaGreen text-black">LONG (BUY)</button>
+                        <button onclick="setLevDirection('short')" id="btn-dir-short" class="flex-1 py-2.5 rounded-xl font-bold text-xs transition bg-transparent text-gray-400 hover:text-white">SHORT (SELL)</button>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1.5">Margin Collateral ($)</label>
+                        <input type="number" id="lev-margin" value="500" oninput="calculateLeverage()" class="w-full bg-deltaBg border border-deltaBorder rounded-xl p-3.5 text-white font-mono text-sm focus:border-deltaBlue outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1.5">Leverage Multiplier (x)</label>
+                        <input type="number" id="lev-mult" value="20" oninput="calculateLeverage()" class="w-full bg-deltaBg border border-deltaBorder rounded-xl p-3.5 text-white font-mono text-sm focus:border-deltaBlue outline-none">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-semibold text-gray-400 mb-1.5">Asset Entry Price ($)</label>
+                        <input type="number" id="lev-entry" value="65000" oninput="calculateLeverage()" class="w-full bg-deltaBg border border-deltaBorder rounded-xl p-3.5 text-white font-mono text-sm focus:border-deltaBlue outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-5 flex flex-col justify-between glass-panel p-6 rounded-3xl border border-deltaBorder">
+                <div>
+                    <span class="text-[11px] font-mono font-bold text-deltaBlue tracking-widest uppercase bg-deltaBlue/10 border border-deltaBlue/20 px-2.5 py-1 rounded-md">Margin Analytics</span>
+                    
+                    <div class="mt-6 space-y-5">
+                        <div class="p-4 rounded-2xl bg-deltaBg/80 border border-deltaBorder">
+                            <p class="text-xs text-gray-400 font-medium">Total Buying Power (Position Size)</p>
+                            <p id="out-lev-power" class="text-3xl font-black font-mono text-deltaBlue mt-1">$10,000.00</p>
+                        </div>
+                        
+                        <div class="p-4 rounded-2xl bg-deltaBg/80 border border-deltaBorder">
+                            <p class="text-xs text-gray-400 font-medium">Estimated Liquidation Threshold</p>
+                            <p id="out-lev-liq" class="text-3xl font-black font-mono text-deltaRed mt-1">$61,750.00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-4 rounded-2xl bg-deltaRed/10 border border-deltaRed/20 text-xs text-gray-300">
+                    <span class="font-bold text-deltaRed">⚠️ Buffer Notice:</span> Keep liquidation price at least 5% away from your technical stop loss level.
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: R:R ENGINE -->
+        <section id="rr" class="calc-section grid grid-cols-1 lg:grid-cols-12 gap-6 hidden">
+            <div class="lg:col-span-7 glass-panel p-6 rounded-3xl border border-deltaBorder">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-xl font-black text-white flex items-center gap-2">
+                            Risk-to-Reward Engine
+                        </h2>
+                        <p class="text-xs text-gray-400 mt-0.5">Evaluate setup probability, breakeven win rate, and expectancy.</p>
+                    </div>
+                    <span class="w-3 h-3 rounded-full bg-deltaYellow animate-pulse"></span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1.5">Entry Price ($)</label>
+                        <input type="number" id="rr-entry" value="100" oninput="calculateRR()" class="w-full bg-deltaBg border border-deltaBorder rounded-xl p-3.5 text-white font-mono text-sm focus:border-deltaYellow outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1.5">Stop Loss ($)</label>
+                        <input type="number" id="rr-stop" value="95" oninput="calculateRR()" class="w-full bg-deltaBg border border-deltaBorder rounded-xl p-3.5 text-white font-mono text-sm focus:border-deltaYellow outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1.5">Take Profit ($)</label>
+                        <input type="number" id="rr-target" value="115" oninput="calculateRR()" class="w-full bg-deltaBg border border-deltaBorder rounded-xl p-3.5 text-white font-mono text-sm focus:border-deltaYellow outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-5 flex flex-col justify-between glass-panel p-6 rounded-3xl border border-deltaBorder">
+                <div>
+                    <span class="text-[11px] font-mono font-bold text-deltaYellow tracking-widest uppercase bg-deltaYellow/10 border border-deltaYellow/20 px-2.5 py-1 rounded-md">Setup Expectancy</span>
+                    
+                    <div class="mt-6 space-y-4">
+                        <div class="p-4 rounded-2xl bg-deltaBg/80 border border-deltaBorder">
+                            <p class="text-xs text-gray-400 font-medium">Risk : Reward Ratio</p>
+                            <p id="out-rr-ratio" class="text-3xl font-black font-mono text-deltaYellow mt-1">1 : 3.00</p>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-deltaBg/80 border border-deltaBorder">
+                            <p class="text-xs text-gray-400 font-medium">Required Breakeven Win-Rate</p>
+                            <p id="out-rr-be" class="text-2xl font-bold font-mono text-deltaGreen mt-1">25.00%</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="out-rr-quality" class="mt-6 p-4 rounded-2xl bg-deltaGreen/10 border border-deltaGreen/30 text-xs font-bold text-deltaGreen text-center">
+                    ✅ INSTITUTIONAL GRADE SETUP (1:3+)
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: COMPOUND GROWTH -->
+        <section id="compound" class="calc-section grid grid-cols-1 lg:grid-cols-12 gap-6 hidden">
+            <div class="lg:col-span-7 glass-panel p-6 rounded-3xl border border-deltaBorder">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-xl font-black text-white flex items-center gap-2">
+                            Compound Portfolio Scaler
+                        </h2>
+                        <p class="text-xs text-gray-400 mt-0.5">Project mathematical compounding over multiple trading sessions/months.</p>
+                    </div>
+                    <span class="w-3 h-3 rounded-full bg-deltaPurple animate-pulse"></span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1.5">Starting Capital ($)</label>
+                        <input type="number" id="cmp-start" value="1000" oninput="calculateCompound()" class="w-full bg-deltaBg border border-deltaBorder rounded-xl p-3.5 text-white font-mono text-sm focus:border-deltaPurple outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1.5">Target Gain/Period (%)</label>
+                        <input type="number" id="cmp-rate" value="5" oninput="calculateCompound()" class="w-full bg-deltaBg border border-deltaBorder rounded-xl p-3.5 text-white font-mono text-sm focus:border-deltaPurple outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1.5">Total Periods (Months)</label>
+                        <input type="number" id="cmp-periods" value="12" oninput="calculateCompound()" class="w-full bg-deltaBg border border-deltaBorder rounded-xl p-3.5 text-white font-mono text-sm focus:border-deltaPurple outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-5 flex flex-col justify-between glass-panel p-6 rounded-3xl border border-deltaBorder">
+                <div>
+                    <span class="text-[11px] font-mono font-bold text-deltaPurple tracking-widest uppercase bg-deltaPurple/10 border border-deltaPurple/20 px-2.5 py-1 rounded-md">Compound Projections</span>
+                    
+                    <div class="mt-6 space-y-4">
+                        <div class="p-4 rounded-2xl bg-deltaBg/80 border border-deltaBorder">
+                            <p class="text-xs text-gray-400 font-medium">Projected Balance</p>
+                            <p id="out-cmp-final" class="text-3xl font-black font-mono text-deltaPurple mt-1">$1,795.86</p>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-deltaBg/80 border border-deltaBorder">
+                            <p class="text-xs text-gray-400 font-medium">Net Profit Accumulated</p>
+                            <p id="out-cmp-profit" class="text-2xl font-bold font-mono text-deltaGreen mt-1">+$795.86</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: QUICK SCRATCHPAD -->
+        <section id="journal" class="calc-section glass-panel p-6 rounded-3xl border border-deltaBorder hidden">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-xl font-black text-white">Trader Scratchpad & Level Notes</h2>
+                    <p class="text-xs text-gray-400 mt-0.5">Quickly store key support/resistance levels and plan parameters. Auto-saved locally.</p>
+                </div>
+                <button onclick="clearNotes()" class="text-xs text-deltaRed hover:underline font-mono">Clear Notes</button>
+            </div>
+            <textarea id="trader-notes" oninput="saveNotes()" placeholder="Paste your key trading levels, watchlist, or plan notes here..." class="w-full h-64 bg-deltaBg border border-deltaBorder rounded-2xl p-4 text-sm font-mono text-gray-200 focus:border-deltaGreen outline-none resize-none"></textarea>
+        </section>
+
+    </main>
+
+    <!-- Bottom Ad Placement Container (Adsterra / Display Ad Slot) -->
+    <div class="max-w-7xl mx-auto px-4 my-4 w-full">
+        <div class="glass-panel p-4 rounded-2xl border border-deltaBorder text-center min-h-[80px] flex items-center justify-center">
+            <!-- PASTE YOUR ADSTERRA BANNER SCRIPT TAG HERE -->
+            <span class="text-xs font-mono text-gray-500 uppercase tracking-wider">[ BOTTOM AD BANNER CONTAINER • READY FOR ADSTERRA SCRIPT ]</span>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation Bar (App Native Feeling) -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 glass-panel border-t border-deltaBorder px-2 py-2 z-50 flex justify-around items-center">
+        <button onclick="switchTab('position')" id="mtab-position" class="tab-btn-mobile flex flex-col items-center gap-1 text-[10px] font-bold text-deltaGreen">
+            <span class="text-base">🎯</span> Position
+        </button>
+        <button onclick="switchTab('leverage')" id="mtab-leverage" class="tab-btn-mobile flex flex-col items-center gap-1 text-[10px] font-bold text-gray-400">
+            <span class="text-base">⚡</span> Leverage
+        </button>
+        <button onclick="switchTab('rr')" id="mtab-rr" class="tab-btn-mobile flex flex-col items-center gap-1 text-[10px] font-bold text-gray-400">
+            <span class="text-base">⚖️</span> R:R Ratio
+        </button>
+        <button onclick="switchTab('compound')" id="mtab-compound" class="tab-btn-mobile flex flex-col items-center gap-1 text-[10px] font-bold text-gray-400">
+            <span class="text-base">📈</span> Compound
+        </button>
+        <button onclick="switchTab('journal')" id="mtab-journal" class="tab-btn-mobile flex flex-col items-center gap-1 text-[10px] font-bold text-gray-400">
+            <span class="text-base">📝</span> Notes
+        </button>
+    </nav>
+
+    <!-- Footer -->
+    <footer class="text-center text-xs text-gray-500 py-4 border-t border-deltaBorder/40">
+        © 2026 DELTA TRADES • Built for Modern Market Operators
+    </footer>
+
+    <!-- Core App Engine JavaScript -->
+    <script>
+        let currentDirection = 'long';
+
+        // Tab Switcher Architecture
+        function switchTab(tabId) {
+            document.querySelectorAll('.calc-section').forEach(sec => sec.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+
+            // Reset Desktop Tab Styles
+            document.querySelectorAll('.tab-btn-desktop').forEach(btn => {
+                btn.className = 'tab-btn-desktop px-4 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition-all';
+            });
+            const activeDTab = document.getElementById('dtab-' + tabId);
+            if(activeDTab) activeDTab.className = 'tab-btn-desktop px-4 py-2 rounded-lg text-xs font-semibold transition-all bg-deltaGreen text-black shadow-md';
+
+            // Reset Mobile Tab Styles
+            document.querySelectorAll('.tab-btn-mobile').forEach(btn => {
+                btn.className = 'tab-btn-mobile flex flex-col items-center gap-1 text-[10px] font-bold text-gray-400';
+            });
+            const activeMTab = document.getElementById('mtab-' + tabId);
+            if(activeMTab) activeMTab.className = 'tab-btn-mobile flex flex-col items-center gap-1 text-[10px] font-bold text-deltaGreen';
+        }
+
+        // 1. Position Size Logic
+        function calculatePosition() {
+            const balance = parseFloat(document.getElementById('ps-balance').value) || 0;
+            const riskPct = parseFloat(document.getElementById('ps-risk').value) || 0;
+            const entry = parseFloat(document.getElementById('ps-entry').value) || 0;
+            const stop = parseFloat(document.getElementById('ps-stop').value) || 0;
+
+            const riskUsd = balance * (riskPct / 100);
+            const priceDiff = Math.abs(entry - stop);
+
+            if (priceDiff === 0 || entry === 0) return;
+
+            const units = riskUsd / priceDiff;
+            const totalNotional = units * entry;
+            const usagePct = (totalNotional / balance) * 100;
+
+            document.getElementById('out-ps-risk-usd').innerText = '$' + riskUsd.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('out-ps-units').innerText = units.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' Units';
+            document.getElementById('out-ps-total').innerText = '$' + totalNotional.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('out-ps-usage').innerText = usagePct.toFixed(2) + '%';
+        }
+
+        function syncRiskSlider(val) {
+            document.getElementById('ps-risk').value = val;
+            document.getElementById('slider-risk-val').innerText = val + '%';
+            calculatePosition();
+        }
+
+        // 2. Leverage Logic
+        function setLevDirection(dir) {
+            currentDirection = dir;
+            const btnLong = document.getElementById('btn-dir-long');
+            const btnShort = document.getElementById('btn-dir-short');
+
+            if (dir === 'long') {
+                btnLong.className = 'flex-1 py-2.5 rounded-xl font-bold text-xs transition bg-deltaGreen text-black';
+                btnShort.className = 'flex-1 py-2.5 rounded-xl font-bold text-xs transition bg-transparent text-gray-400 hover:text-white';
+            } else {
+                btnShort.className = 'flex-1 py-2.5 rounded-xl font-bold text-xs transition bg-deltaRed text-white';
+                btnLong.className = 'flex-1 py-2.5 rounded-xl font-bold text-xs transition bg-transparent text-gray-400 hover:text-white';
+            }
+            calculateLeverage();
+        }
+
+        function calculateLeverage() {
+            const margin = parseFloat(document.getElementById('lev-margin').value) || 0;
+            const mult = parseFloat(document.getElementById('lev-mult').value) || 1;
+            const entry = parseFloat(document.getElementById('lev-entry').value) || 0;
+
+            const power = margin * mult;
+            let liq = 0;
+
+            if (currentDirection === 'long') {
+                liq = entry * (1 - (1 / mult));
+            } else {
+                liq = entry * (1 + (1 / mult));
+            }
+
+            document.getElementById('out-lev-power').innerText = '$' + power.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('out-lev-liq').innerText = '$' + liq.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
+        // 3. R:R Logic
+        function calculateRR() {
+            const entry = parseFloat(document.getElementById('rr-entry').value) || 0;
+            const stop = parseFloat(document.getElementById('rr-stop').value) || 0;
+            const target = parseFloat(document.getElementById('rr-target').value) || 0;
+
+            const risk = Math.abs(entry - stop);
+            const reward = Math.abs(target - entry);
+
+            if (risk === 0) return;
+
+            const ratio = reward / risk;
+            const breakevenWinRate = (1 / (1 + ratio)) * 100;
+
+            document.getElementById('out-rr-ratio').innerText = '1 : ' + ratio.toFixed(2);
+            document.getElementById('out-rr-be').innerText = breakevenWinRate.toFixed(2) + '%';
+
+            const qualityEl = document.getElementById('out-rr-quality');
+            if (ratio >= 3) {
+                qualityEl.innerText = '✅ INSTITUTIONAL GRADE SETUP (1:3+)';
+                qualityEl.className = 'mt-6 p-4 rounded-2xl bg-deltaGreen/10 border border-deltaGreen/30 text-xs font-bold text-deltaGreen text-center';
+            } else if (ratio >= 2) {
+                qualityEl.innerText = '⚡ ACCEPTABLE RISK RATIO (1:2)';
+                qualityEl.className = 'mt-6 p-4 rounded-2xl bg-deltaBlue/10 border border-deltaBlue/30 text-xs font-bold text-deltaBlue text-center';
+            } else {
+                qualityEl.innerText = '⚠️ POOR EXPECTANCY (< 1:2)';
+                qualityEl.className = 'mt-6 p-4 rounded-2xl bg-deltaRed/10 border border-deltaRed/30 text-xs font-bold text-deltaRed text-center';
+            }
+        }
+
+        // 4. Compound Logic
+        function calculateCompound() {
+            let start = parseFloat(document.getElementById('cmp-start').value) || 0;
+            const rate = parseFloat(document.getElementById('cmp-rate').value) / 100 || 0;
+            const periods = parseInt(document.getElementById('cmp-periods').value) || 0;
+
+            let current = start;
+            for (let i = 0; i < periods; i++) {
+                current += current * rate;
+            }
+
+            const profit = current - start;
+            document.getElementById('out-cmp-final').innerText = '$' + current.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('out-cmp-profit').innerText = '+$' + profit.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
+        // Scratchpad Persistence
+        function saveNotes() {
+            localStorage.setItem('delta_trader_notes', document.getElementById('trader-notes').value);
+        }
+        function loadNotes() {
+            const saved = localStorage.getItem('delta_trader_notes');
+            if(saved) document.getElementById('trader-notes').value = saved;
+        }
+        function clearNotes() {
+            document.getElementById('trader-notes').value = '';
+            localStorage.removeItem('delta_trader_notes');
+        }
+
+        // Initial Calculations On Launch
+        calculatePosition();
+        calculateLeverage();
+        calculateRR();
+        calculateCompound();
+        loadNotes();
+    </script>
+</body>
+</html>
